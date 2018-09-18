@@ -23,14 +23,13 @@ public class SensorDataHandler {
                 System.out.println(" >>> GPIO pin state changed: time=" + System.currentTimeMillis() + ", " + event.getPin() + " = " + event.getState());
             MqttMessage message = null;
             if (event.getState().isHigh()) {
-                // motionDetected();
                 message = new MqttMessage("1".getBytes());
             }
             if (event.getState().isLow()) {
                 message = new MqttMessage("0".getBytes());
-                // motionDetected();
             }
             try {
+                message.setQos(0);
                 this.client.publish(IoTConstants.FEED_MOTION, message);
             } catch (MqttException e) {
                 e.printStackTrace();

@@ -26,18 +26,19 @@ public class AdafruitMqttClient implements MqttCallback {
         this.options = new MqttConnectOptions();
         this.options.setUserName(IoTConstants.USER_NAME);
         this.options.setPassword(IoTConstants.PASSWORD);
+        this.options.setCleanSession(true);
     }
 
     public void start() {
         System.out.println("Starting Mqtt Cilent...");
         try {
             this.client = new MqttClient(IoTConstants.SERVER_URI, IoTConstants.CLIENT_ID);
-            this.client.connect(this.options);
             this.client.setCallback(this);
+            this.client.connect(this.options);
             this.md.setClient(this.client);
             this.md.init();
 
-            IMqttToken tkn = this.client.subscribeWithResponse(IoTConstants.TOPICS);
+            IMqttToken tkn = this.client.subscribeWithResponse(IoTConstants.TOPICS, IoTConstants.QOS);
             Arrays.asList(tkn.getTopics()).forEach(e -> System.out.println("Subscribed to topic : " + e));
         } catch (MqttException e1) {
             e1.printStackTrace();
@@ -56,8 +57,8 @@ public class AdafruitMqttClient implements MqttCallback {
             if (this.client.isConnected()) {
                 this.client.disconnect();
             }
-            this.client.connect(this.options);
             this.client.setCallback(this);
+            this.client.connect(this.options);
             IMqttToken tkn = this.client.subscribeWithResponse(IoTConstants.TOPICS);
             Arrays.asList(tkn.getTopics()).forEach(e -> System.out.println("Subscribed to topic : " + e));
         } catch (MqttException e) {
